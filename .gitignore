@@ -1,0 +1,6 @@
+/vendor/
+/node_modules/
+/uploads/
+/zips/
+.env
+*.log
