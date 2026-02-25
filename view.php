@@ -20,90 +20,120 @@ $zip->close();
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($album['name']) ?></title>
 
     <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-            background: #0d0d12;
-            color: #fff;
+        * {
+            box-sizing: border-box;
         }
 
-        /* TOP NAV */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #141427, #1f1f3a, #2a1a40);
+            color: white;
+        }
+
+        /* ================= TOPBAR ================= */
+
         .topbar {
-            padding: 15px 25px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background: #111;
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 1000;
+
+            background: rgba(20, 20, 35, .75);
+            backdrop-filter: blur(12px);
+
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, .35);
+        }
+
+        .topbar-inner {
+            max-width: 1400px;
+            margin: auto;
+            padding: 14px 20px;
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .topbar a {
             text-decoration: none;
             color: white;
+            background: rgba(255, 255, 255, .08);
             padding: 8px 14px;
-            border-radius: 8px;
-            background: #1f1f2a;
+            border-radius: 10px;
+            font-size: 14px;
         }
 
         .title {
-            margin-left: 10px;
+            margin-left: auto;
             opacity: .7;
+            font-size: 14px;
         }
 
-        /* GRID */
+        /* ================= MASONRY GRID ================= */
+
         .grid {
-            column-count: 4;
-            column-gap: 10px;
-            padding: 10px;
+            column-width: 260px;
+            column-gap: 14px;
+
+            max-width: 1600px;
+            margin: 24px auto 60px auto;
+            padding: 0 18px;
         }
 
         .grid img {
             width: 100%;
-            margin-bottom: 10px;
-            border-radius: 8px;
+            margin-bottom: 14px;
+            border-radius: 14px;
             cursor: zoom-in;
-            transition: .2s;
+            transition: transform .25s ease, box-shadow .25s ease;
+            display: block;
         }
 
-        .grid img:hover {
-            transform: scale(1.02);
-        }
-
-        @media(max-width:900px) {
-            .grid {
-                column-count: 2;
+        @media (hover:hover) {
+            .grid img:hover {
+                transform: scale(1.02);
+                box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
             }
         }
 
-        /* LIGHTBOX */
+        /* ================= LIGHTBOX ================= */
+
         .lightbox {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, .95);
+            background: rgba(0, 0, 0, .96);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 999;
+            z-index: 2000;
+            touch-action: pan-y;
         }
 
         .lightbox img {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 95vw;
+            max-height: 90vh;
+            border-radius: 12px;
+            object-fit: contain;
         }
 
         .nav {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 40px;
+            font-size: 42px;
             cursor: pointer;
             padding: 20px;
             user-select: none;
+            opacity: .7;
+        }
+
+        .nav:hover {
+            opacity: 1;
         }
 
         .prev {
@@ -114,37 +144,36 @@ $zip->close();
             right: 20px;
         }
 
-        #viewer img {
-            max-width: 95vw;
-            max-height: 88vh;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-        }
-
         .close {
             position: absolute;
             top: 20px;
             right: 25px;
-            font-size: 30px;
+            font-size: 28px;
             cursor: pointer;
+            opacity: .7;
         }
 
-        @media (max-width:1000px) {
-            .grid {
-                column-count: 3;
-            }
+        .close:hover {
+            opacity: 1;
         }
 
-        @media (max-width:700px) {
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width:768px) {
             .grid {
-                column-count: 2;
+                column-width: 200px;
+                padding: 0 12px;
             }
         }
 
         @media (max-width:480px) {
             .grid {
-                column-count: 1;
+                column-width: 100%;
+                padding: 0 10px;
+            }
+
+            .nav {
+                font-size: 34px;
             }
         }
     </style>
@@ -153,14 +182,18 @@ $zip->close();
 <body>
 
     <div class="topbar">
-        <a href="index.php">🏠 Home</a>
-        <a href="albums.php">📁 Albums</a>
-        <div class="title"><?= htmlspecialchars($album['name']) ?></div>
+        <div class="topbar-inner">
+            <a href="index.php">🏠 Home</a>
+            <a href="albums.php">📁 Albums</a>
+            <div class="title"><?= htmlspecialchars($album['name']) ?></div>
+        </div>
     </div>
 
     <div class="grid">
         <?php foreach ($images as $i => $img): ?>
-            <img src="image.php?zip=<?= $album['zipname'] ?>&file=<?= urlencode($img) ?>"
+            <img
+                loading="lazy"
+                src="image.php?zip=<?= $album['zipname'] ?>&file=<?= urlencode($img) ?>"
                 onclick="openLightbox(<?= $i ?>)">
         <?php endforeach; ?>
     </div>
@@ -178,20 +211,23 @@ $zip->close();
         const zip = "<?= $album['zipname'] ?>";
 
         let index = 0;
+        const lightbox = document.getElementById('lightbox');
+        const viewer = document.getElementById('viewer');
 
         function openLightbox(i) {
             index = i;
             show();
-            document.getElementById('lightbox').style.display = 'flex';
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         function closeLightbox() {
-            document.getElementById('lightbox').style.display = 'none';
+            lightbox.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         function show() {
-            document.getElementById('viewer').src =
-                "image.php?zip=" + zip + "&file=" + encodeURIComponent(images[index]);
+            viewer.src = "image.php?zip=" + zip + "&file=" + encodeURIComponent(images[index]);
         }
 
         function next() {
@@ -204,28 +240,26 @@ $zip->close();
             show();
         }
 
-        /* keyboard support */
         document.addEventListener('keydown', e => {
-            if (document.getElementById('lightbox').style.display === 'flex') {
+            if (lightbox.style.display === 'flex') {
                 if (e.key === "ArrowRight") next();
                 if (e.key === "ArrowLeft") prev();
                 if (e.key === "Escape") closeLightbox();
             }
         });
-    </script>
 
-    <script>
+        /* Swipe Support */
         let startX = 0;
 
-        document.getElementById("viewer").addEventListener("touchstart", e => {
+        viewer.addEventListener("touchstart", e => {
             startX = e.touches[0].clientX;
         });
 
-        document.getElementById("viewer").addEventListener("touchend", e => {
+        viewer.addEventListener("touchend", e => {
             let endX = e.changedTouches[0].clientX;
 
-            if (endX - startX > 50) prevImage();
-            if (startX - endX > 50) nextImage();
+            if (endX - startX > 60) prev();
+            if (startX - endX > 60) next();
         });
     </script>
 
